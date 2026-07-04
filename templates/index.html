@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Pulse — Quantum Computing Industry Feed</title>
+    <meta name="description" content="Stay up to date with the latest quantum computing updates, announcements, and research from IBM Quantum and PennyLane. Select posts and tweet them directly.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 stroke=%22%238b5cf6%22 stroke-width=%228%22 fill=%22none%22/><circle cx=%2250%22 cy=%2250%22 r=%2215%22 fill=%22%238b5cf6%22/></svg>">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Application Header -->
+        <header class="app-header" id="app-header-nav">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <div class="logo-ring"></div>
+                    <div class="logo-dot"></div>
+                </div>
+                <h1 class="logo-text" id="app-logo-title">Quantum Pulse</h1>
+            </div>
+            
+            <div class="status-badge" id="app-connection-badge">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-label">Connecting...</span>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Layout -->
+        <main class="dashboard-grid">
+            
+            <!-- Left Side: Feed List -->
+            <section class="feed-container">
+                
+                <!-- Filter Controls & Search -->
+                <div class="feed-controls">
+                    <div class="filter-group" id="filter-btn-group">
+                        <button class="filter-btn active" id="filter-all">All Updates</button>
+                        <button class="filter-btn" id="filter-ibm">IBM Quantum</button>
+                        <button class="filter-btn" id="filter-pl">PennyLane</button>
+                    </div>
+                    
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="search-input" placeholder="Search title, tags, or author..." aria-label="Search posts">
+                    </div>
+                    
+                    <div class="action-group">
+                        <button class="refresh-btn" id="refresh-btn" aria-label="Reload feed">
+                            <!-- Spinner Icon -->
+                            <svg class="spinner-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.15s ease;">
+                                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C14.8273 3 17.3386 4.30219 19 6.34091M19 6.34091V3M19 6.34091H15.7273" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Refresh</span>
+                        </button>
+                        <span class="last-updated-text" id="last-updated-time">Checking...</span>
+                    </div>
+                </div>
+                
+                <!-- News Feed Cards List -->
+                <div class="feed-list" id="feed-list" aria-live="polite">
+                    <!-- Cards will be populated by main.js -->
+                </div>
+                
+            </section>
+
+            <!-- Right Side: Tweet Composer -->
+            <aside class="composer-wrapper">
+                <section class="composer-container" id="tweet-composer-card">
+                    <div class="composer-header">
+                        <div class="composer-icon-box" aria-hidden="true">
+                            <!-- X Logo representation -->
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </div>
+                        <h2 class="composer-title">Tweet Composer</h2>
+                    </div>
+
+                    <!-- Composer Placeholder (Nothing Selected) -->
+                    <div class="composer-placeholder" id="composer-placeholder">
+                        <div class="placeholder-icon" aria-hidden="true">📡</div>
+                        <p class="placeholder-text">Select an update from the feed to compose and post a tweet directly.</p>
+                    </div>
+
+                    <!-- Composer Form (Article Selected) -->
+                    <div class="composer-active-content" id="composer-active" style="display: none;">
+                        
+                        <!-- Selected Post Meta Preview -->
+                        <div class="selected-article-preview">
+                            <span class="source-badge" id="preview-source">Source</span>
+                            <h3 class="preview-title" id="preview-title">Article Title</h3>
+                            <a href="#" class="preview-link" id="preview-link" target="_blank" rel="noopener">Link URL</a>
+                        </div>
+                        
+                        <!-- Tweet Textbox -->
+                        <div class="tweet-textarea-wrapper">
+                            <label for="tweet-textarea" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">Tweet text</label>
+                            <textarea class="tweet-textarea" id="tweet-textarea" placeholder="What's happening in quantum?"></textarea>
+                        </div>
+                        
+                        <!-- Hashtags Suggestions -->
+                        <div class="hashtag-section">
+                            <span class="hashtag-label">Quick Hashtags</span>
+                            <div class="hashtag-chips" id="hashtag-chips">
+                                <!-- Chips will be populated by main.js -->
+                            </div>
+                        </div>
+                        
+                        <!-- Actions & Counters -->
+                        <div class="composer-footer">
+                            <div class="char-counter-container">
+                                <!-- Circular Progress Ring -->
+                                <svg class="progress-ring-svg" width="28" height="28" aria-hidden="true">
+                                    <circle class="progress-ring-circle-bg" stroke-width="2.5" r="10" cx="14" cy="14"/>
+                                    <circle class="progress-ring-circle" id="char-progress-ring" stroke-width="2.5" r="10" cx="14" cy="14" stroke-dasharray="62.8" stroke-dashoffset="62.8"/>
+                                </svg>
+                                <span class="char-count-text" id="char-count">280</span>
+                            </div>
+                            
+                            <button class="tweet-btn" id="tweet-btn" disabled>
+                                <span>Post Tweet</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                    </div>
+                </section>
+            </aside>
+            
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Quantum Pulse &copy; 2026. Made with ❤️ for the Quantum Community.</p>
+            <p style="margin-top: 0.25rem;">Data fetched from <a href="https://www.ibm.com/quantum/blog" target="_blank" rel="noopener">IBM Quantum Blog</a> &amp; <a href="https://pennylane.ai/blog/" target="_blank" rel="noopener">PennyLane Blog</a>.</p>
+        </footer>
+    </div>
+
+    <!-- Frontend Logic Script -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
